@@ -1,39 +1,59 @@
-var ejs = require('ejs'),
-  UglifyJS = require('uglify-js'),
-  utils = require('loader-utils'),
-  path = require('path'),
-  htmlmin = require('html-minifier'),
-  merge = require('merge');
+const ejs = require("ejs");
+const loaderUtils = require("loader-utils");
+const path = require("path");
+const htmlmin = require("html-minifier");
 
+const DEFAULT_OPTIONS = {
+  data: {},
+  exportAsDefault: false,
+  exportAsEs6Default: false,
+  minify: true,
+  minifyOptions: {},
+  ejsOptions: {}
+};
 
-module.exports = function (source) {
+const DEFAULT_EJS_OPTIONS = {
+  client: true
+};
+
+module.exports = function(source) {
   this.cacheable && this.cacheable();
 
-  var query = typeof this.query === 'object' ? this.query : utils.parseQuery(this.query);
-  var opts = merge(this.options['ejs-compiled-loader'] || {}, query);
-  opts.client = true;
+  const options = Object.assign({}, DEFAULT_OPTIONS, loaderUtils.getOptions(this));
+  const ejsOptions = Object.assign({}, DEFAULT_EJS_OPTIONS, options.ejsOptions);
+  const minifyOptions = Object.assign({}, options.minifyOptions);
 
-  // Skip compile debug for production when running with
-  // webpack --optimize-minimize
-  if (this.minimize && opts.compileDebug === undefined) {
-    opts.compileDebug = false;
+  let result = ejs.render(source, options.data, ejsOptions);
+
+  if (options.minify) {
+    [
+      "removeComments",
+      "removeCommentsFromCDATA",
+      "removeCDATASectionsFromCDATA",
+      "collapseWhitespace",
+      "conservativeCollapse",
+      "removeAttributeQuotes",
+      "useShortDoctype",
+      "keepClosingSlash",
+      "minifyJS",
+      "minifyCSS",
+      "removeScriptTypeAttributes",
+      "removeStyleTypeAttributes"
+    ].forEach(function(name) {
+      if (typeof minifyOptions[name] === "undefined") {
+        minifyOptions[name] = true;
+      }
+    });
+
+    result = htmlmin.minify(result, minifyOptions);
   }
 
-  // Use filenames relative to working dir, which should be project root
-  opts.filename = path.relative(process.cwd(), this.resourcePath);
-
-  if (opts.htmlmin) {
-    source = htmlmin.minify(source, opts['htmlminOptions'] || {});
+  let prefix = "module.exports = ";
+  if (options.exportAsDefault) {
+    prefix = "exports.default = ";
+  } else if (options.exportAsEs6Default) {
+    prefix = "export default ";
   }
 
-  var template = ejs.compile(source, opts);
-
-  // Beautify javascript code
-  if (!this.minimize && opts.beautify !== false) {
-    var ast = UglifyJS.parse(template.toString());
-    ast.figure_out_scope();
-    template = ast.print_to_string({beautify: true});
-  }
-
-  return 'module.exports = ' + template;
+  return prefix + JSON.stringify(result) + ";";
 };

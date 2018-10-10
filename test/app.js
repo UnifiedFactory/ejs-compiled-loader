@@ -1,13 +1,13 @@
-const assert = require('assert');
+const assert = require("assert");
 
-var tpl = require("./template.ejs");
-assert.equal(tpl({noun: "World"}), 'Hello, World!\n');
+const simpleParsed = "<p>\n  I like simple.\n</p>\n";
+const simple = require("./simple.ejs");
+assert.equal(simple, simpleParsed);
 
-var tpl3 = require("./subdir/parent.ejs");
-assert.equal(tpl3({foo: "foo"}), "parent: child: foo\n\n");
+const minified = require("./minified.ejs");
+assert.equal(minified, "<p> I like minified. </p> ");
 
-var tpl4 = require("./htmlmin.ejs");
-assert.equal(tpl4({test: 123}), '123\n');
+const es6export = require("./es6export.ejs");
+assert.deepEqual(es6export, { default: "<p> I like es6. </p> " });
 
-var tpl2 = require("!!../?delimiter=?!./template2.ejs");
-assert.equal(tpl2({hobbies: ["food", "code"]}).trimRight(), "  I like food.\n  I like code.");
+console.log("All tests passed!");

@@ -1,18 +1,46 @@
+const ejsRenderedLoader = require.resolve("../index");
+
 module.exports = {
   entry: "./app.js",
-  cache: false,
+
   output: {
     path: __dirname,
     filename: "bundle.js"
   },
+
   module: {
-    loaders: [
-      {test: /\.ejs$/, loader: require.resolve("../") + "?htmlmin"}
+    rules: [
+      {
+        test: /simple\.ejs$/,
+        loader: ejsRenderedLoader,
+        options: {
+          data: {
+            hobby: "simple"
+          },
+          minify: false
+        }
+      },
+      {
+        test: /minified\.ejs$/,
+        loader: ejsRenderedLoader,
+        options: {
+          data: {
+            hobby: "minified"
+          },
+          minify: true
+        }
+      },
+      {
+        test: /es6export\.ejs$/,
+        loader: ejsRenderedLoader,
+        options: {
+          data: {
+            hobby: "es6"
+          },
+          minify: true,
+          exportAsEs6Default: true
+        }
+      }
     ]
-  },
-  'ejs-compiled-loader': {
-    'htmlminOptions': {
-      removeComments: true
-    }
   }
-}
+};
