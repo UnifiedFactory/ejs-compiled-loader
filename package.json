@@ -1,10 +1,11 @@
 {
   "name": "ejs-rendered-loader",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "EJS rendered webpack loader",
   "main": "index.js",
   "scripts": {
-    "test": "cd test && node index.js && node bundle.js"
+    "test": "cd test && node index.js && node bundle.js",
+    "prepare": "npm run test"
   },
   "files": [
     "index.js",

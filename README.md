@@ -1,60 +1,27 @@
-# ejs-compiled-loader for webpack
+# ejs-rendered-loader for webpack
 
-EJS loader for [webpack](http://webpack.github.io/). Uses [ejs](https://github.com/mde/ejs) function to compile templates.
-
-To use [EJS by tj](https://github.com/tj/ejs) use 1.x branch and 1.x.x versions.
+EJS loader for [webpack](http://webpack.github.io/). Uses [ejs](https://github.com/mde/ejs) function to render templates statically.
 
 ## Installation
 
-`npm install ejs-compiled-loader`
-
-## Usage
-
-[Documentation: Using loaders](http://webpack.github.io/docs/using-loaders.html)
-
-``` javascript
-var template = require("ejs-compiled!./file.ejs");
-// => returns the template function compiled with ejs templating engine.
-
-// And then use it somewhere in your code
-template(data) // Pass object with data
-
-// Child Templates
-// path is relative to where webpack is being run
-<%- include templates/child -%>
-```
+`npm install ejs-rendered-loader`
 
 ## Options
 
-Following options can be specified in query:
+Following options can be specified in `options`:
 
-`beautify` — enable or disable uglify-js beautify of template ast
+`data` - data to be passed into templates scopes. Default `{}`
 
-`compileDebug` — see ejs compileDebug option
+`exportAsDefault` - exports rendered templates as `exports.default =`. Default `false`
 
-`htmlmin` — see [htmlminify section](#htmlminify)
+`exportAsEs6Default` - exports rendered templates as `export default`. Default `false`
 
-## htmlminify
+`minify` - Minifiy rendered templates with `html-minifier`. Default `true`
 
-```javascript
-module: {
-  loaders: [
-    {test: /\.ejs$/, loader: 'ejs-compiled?htmlmin'} // enable here
-  ]
-},
-'ejs-compiled-loader': {
-  'htmlmin': true, // or enable here  
-  'htmlminOptions': {
-    removeComments: true
-  }
-}
-```
+`minifyOptions` - Options to be passed to `html-minifier`. See `index.js` for defaults.
 
-See [all options reference](https://github.com/kangax/html-minifier#options-quick-reference)
+`ejsOptions` - options to be passed to `ejs` renderr. See `index.js` for defaults.
 
 ## License
 
 MIT (http://www.opensource.org/licenses/mit-license.php)
-
-
-
